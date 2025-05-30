@@ -7,12 +7,12 @@ export interface GameState {
   lives: number;
   isGameOver: boolean;
   controlVector: { x: number; y: number };
-  shipPosition: THREE.Vector3; // 追加: 機体位置
+  shipPosition: THREE.Vector3;
   bullets: { id: string; position: THREE.Vector3; velocity: THREE.Vector3 }[];
   enemies: { id: string; position: THREE.Vector3; velocity: THREE.Vector3 }[];
 
   setControlVector: (vec: { x: number; y: number }) => void;
-  updateShipPosition: (pos: THREE.Vector3) => void; // 機体位置更新
+  updateShipPosition: (pos: THREE.Vector3) => void;
   addScore: (value: number) => void;
   loseLife: () => void;
   resetGame: () => void;
@@ -65,7 +65,7 @@ export const useGameStore = create<GameState>()(
         state.bullets.push({
           id,
           position: startPos.clone(),
-          velocity: direction.clone().multiplyScalar(10),
+          velocity: direction.clone().multiplyScalar(20),
         });
       }),
     removeBullet: (id) =>

@@ -8,13 +8,12 @@ export default function FireButton() {
 
   const handleFire = () => {
     const dir = new THREE.Vector3(0, 0, -1);
-    console.log(shipPosition);
     fireBullet(shipPosition, dir);
   };
 
   return (
     <button
-      className="absolute bottom-8 right-8 p-4 bg-blue-500 text-white rounded-full z-10"
+      className="absolute bottom-8 right-8 p-4 bg-blue-500 text-white rounded-full z-10 shadow-lg"
       onTouchStart={handleFire}
       onClick={handleFire}
     >

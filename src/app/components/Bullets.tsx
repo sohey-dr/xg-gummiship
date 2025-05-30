@@ -2,6 +2,7 @@
 import { useFrame } from "@react-three/fiber";
 import { useGameStore } from "../stores/gameStore";
 import * as THREE from "three";
+import { Trail } from "@react-three/drei";
 
 export default function Bullets() {
   const bullets = useGameStore((state) => state.bullets);
@@ -13,15 +14,13 @@ export default function Bullets() {
   useFrame((_, delta) => {
     bullets.forEach((b) => {
       b.position.addScaledVector(b.velocity, delta);
-      // 画面外チェック
       if (
-        Math.abs(b.position.x) > 20 ||
-        Math.abs(b.position.y) > 10 ||
-        Math.abs(b.position.z) > 10
+        Math.abs(b.position.x) > 25 ||
+        Math.abs(b.position.y) > 12 ||
+        Math.abs(b.position.z) > 12
       ) {
         removeBullet(b.id);
       } else {
-        // 敵との衝突判定
         enemies.forEach((e) => {
           if (b.position.distanceTo(e.position) < 0.5) {
             removeBullet(b.id);
@@ -36,10 +35,23 @@ export default function Bullets() {
   return (
     <>
       {bullets.map((b) => (
-        <mesh key={b.id} position={[b.position.x, b.position.y, b.position.z]}>
-          <sphereGeometry args={[0.1, 8, 8]} />
-          <meshStandardMaterial color="yellow" />
-        </mesh>
+        <Trail
+          key={b.id}
+          width={0.05}
+          length={5}
+          color="yellow"
+          attenuation={(t) => 1 - t}
+          stride={0.1}
+        >
+          <mesh position={[b.position.x, b.position.y, b.position.z]}>
+            <sphereGeometry args={[0.1, 8, 8]} />
+            <meshStandardMaterial
+              emissive="yellow"
+              emissiveIntensity={1}
+              color="black"
+            />
+          </mesh>
+        </Trail>
       ))}
     </>
   );
