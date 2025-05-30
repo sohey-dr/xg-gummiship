@@ -1,14 +1,21 @@
 "use client";
 import { useGameStore } from "../stores/gameStore";
 import * as THREE from "three";
+import { useRef } from "react";
 
 export default function FireButton() {
   const fireBullet = useGameStore((state) => state.fireBullet);
   const shipPosition = useGameStore((state) => state.shipPosition);
+  const lastFireTime = useRef(0);
+  const COOLDOWN = 100; // クールダウン時間（ミリ秒）
 
   const handleFire = () => {
+    const now = Date.now();
+    if (now - lastFireTime.current < COOLDOWN) return;
+
     const dir = new THREE.Vector3(0, 0, -1);
     fireBullet(shipPosition, dir);
+    lastFireTime.current = now;
   };
 
   return (
