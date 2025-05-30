@@ -8,7 +8,7 @@ import { useGameStore } from "../stores/gameStore";
 export default function Ship() {
   const ref = useRef<THREE.Mesh>(null);
   const { controlVector } = useGameStore((state) => state);
-  const moveSpeed = 5; // 移動速度係数
+  const moveSpeed = 300; // 移動速度係数
 
   useFrame((_, delta) => {
     if (!ref.current) return;

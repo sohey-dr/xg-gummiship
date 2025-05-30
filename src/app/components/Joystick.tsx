@@ -8,8 +8,8 @@ export default function VirtualJoystick() {
 
   const handleMove = (evt: IJoystickUpdateEvent) => {
     // evt.x, evt.y は -50～50 の範囲なので -1～1 に正規化
-    const x = evt.x ? Math.max(-1, Math.min(1, evt.x / 1)) : 0;
-    const y = evt.y ? Math.max(-1, Math.min(1, evt.y / 1)) : 0;
+    const x = evt.x ? Math.max(-1, Math.min(1, evt.x / 50)) : 0;
+    const y = evt.y ? Math.max(-1, Math.min(1, evt.y / 50)) : 0;
     setControlVector({ x, y });
   };
   const handleStop = () => setControlVector({ x: 0, y: 0 });
