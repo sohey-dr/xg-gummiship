@@ -20,12 +20,13 @@ function BulletMesh({
   const enemies = useGameStore((state) => state.enemies);
   const removeEnemy = useGameStore((state) => state.removeEnemy);
   const addScore = useGameStore((state) => state.addScore);
+  const initialPosition = useRef(startPos.clone());
 
   useEffect(() => {
     if (meshRef.current) {
-      meshRef.current.position.copy(startPos);
+      meshRef.current.position.copy(initialPosition.current);
     }
-  }, [startPos]);
+  }, []);
 
   useFrame((_, delta) => {
     if (!meshRef.current) return;

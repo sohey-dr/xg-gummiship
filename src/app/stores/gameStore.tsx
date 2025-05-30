@@ -29,8 +29,16 @@ export const useGameStore = create<GameState>()(
     isGameOver: false,
     controlVector: { x: 0, y: 0 } as const,
     shipPosition: new THREE.Vector3(),
-    bullets: [] as any[],
-    enemies: [] as any[],
+    bullets: [] as {
+      id: string;
+      position: THREE.Vector3;
+      velocity: THREE.Vector3;
+    }[],
+    enemies: [] as {
+      id: string;
+      position: THREE.Vector3;
+      velocity: THREE.Vector3;
+    }[],
 
     setControlVector: (vec) =>
       set((state) => {
@@ -62,11 +70,14 @@ export const useGameStore = create<GameState>()(
     fireBullet: (startPos, direction) =>
       set((state) => {
         const id = crypto.randomUUID();
-        state.bullets.push({
-          id,
-          position: startPos.clone(),
-          velocity: direction.clone().multiplyScalar(20),
-        });
+        state.bullets = [
+          ...state.bullets,
+          {
+            id,
+            position: startPos.clone(),
+            velocity: direction.clone().multiplyScalar(20),
+          },
+        ];
       }),
     removeBullet: (id) =>
       set((state) => {
