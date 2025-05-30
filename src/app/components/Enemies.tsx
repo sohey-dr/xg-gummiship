@@ -19,12 +19,13 @@ function EnemyMesh({
   const removeEnemy = useGameStore((state) => state.removeEnemy);
   const loseLife = useGameStore((state) => state.loseLife);
   const shipPos = useGameStore((state) => state.shipPosition);
+  const initialPosition = useRef(startPos.clone());
 
   useEffect(() => {
     if (meshRef.current) {
-      meshRef.current.position.copy(startPos);
+      meshRef.current.position.copy(initialPosition.current);
     }
-  }, [startPos]);
+  }, []);
 
   useFrame((_, delta) => {
     if (!meshRef.current) return;
@@ -38,7 +39,7 @@ function EnemyMesh({
       return;
     }
     // 画面外削除
-    if (pos.z > 0) {
+    if (pos.z > 10) {
       removeEnemy(id);
     }
   });
