@@ -6,18 +6,13 @@ import { IJoystickUpdateEvent } from "react-joystick-component/build/lib/Joystic
 export default function VirtualJoystick() {
   const setControlVector = useGameStore((state) => state.setControlVector);
 
-  // ジョイスティック移動中のコールバック
   const handleMove = (evt: IJoystickUpdateEvent) => {
-    setControlVector({
-      x: evt.x ? evt.x / 1 : 0,
-      y: evt.y ? evt.y / 1 : 0,
-    });
+    // evt.x, evt.y は -50～50 の範囲なので -1～1 に正規化
+    const x = evt.x ? Math.max(-1, Math.min(1, evt.x / 1)) : 0;
+    const y = evt.y ? Math.max(-1, Math.min(1, evt.y / 1)) : 0;
+    setControlVector({ x, y });
   };
-
-  // ジョイスティックを離したときのコールバック
-  const handleStop = () => {
-    setControlVector({ x: 0, y: 0 });
-  };
+  const handleStop = () => setControlVector({ x: 0, y: 0 });
 
   return (
     <div className="absolute bottom-8 left-8 z-10">

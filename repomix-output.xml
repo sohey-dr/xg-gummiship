@@ -1,0 +1,167 @@
+This file is a merged representation of a subset of the codebase, containing specifically included files, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Only files matching these patterns are included: src/app/components/Joystick.tsx, src/app/page.tsx, src/app/components/Ship.tsx
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+src/
+  app/
+    components/
+      Joystick.tsx
+      Ship.tsx
+    page.tsx
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="src/app/components/Joystick.tsx">
+"use client";
+import { Joystick } from "react-joystick-component";
+import { useGameStore } from "../stores/gameStore";
+import { IJoystickUpdateEvent } from "react-joystick-component/build/lib/Joystick";
+
+export default function VirtualJoystick() {
+  const setControlVector = useGameStore((state) => state.setControlVector);
+
+  // ジョイスティック移動中のコールバック
+  const handleMove = (evt: IJoystickUpdateEvent) => {
+    setControlVector({
+      x: evt.x ? evt.x / 1 : 0,
+      y: evt.y ? evt.y / 1 : 0,
+    });
+  };
+
+  // ジョイスティックを離したときのコールバック
+  const handleStop = () => {
+    setControlVector({ x: 0, y: 0 });
+  };
+
+  return (
+    <div className="absolute bottom-8 left-8 z-10">
+      <Joystick
+        size={100} // ジョイスティック領域の直径
+        baseColor="rgba(255,255,255,0.3)" // 土台の半透明色
+        stickColor="rgba(255,255,255,0.6)" // スティック部分の色
+        throttle={0.9} // 感度調整係数
+        move={handleMove}
+        stop={handleStop}
+      />
+    </div>
+  );
+}
+</file>
+
+<file path="src/app/components/Ship.tsx">
+"use client";
+
+import { useFrame } from "@react-three/fiber";
+import { useRef } from "react";
+import * as THREE from "three";
+import { useGameStore } from "../stores/gameStore";
+
+export default function Ship() {
+  const ref = useRef<THREE.Mesh>(null);
+  const controlVector = useGameStore((state) => state.controlVector);
+
+  const moveSpeed = 5; // 前後移動のスピード係数
+  const rotateSpeed = 1.5; // 旋回のスピード係数
+
+  useFrame((_, delta) => {
+    if (ref.current) {
+      // 左右入力(controlVector.x)でY軸回転
+      ref.current.rotation.y -= controlVector.x * delta * rotateSpeed;
+
+      // 前後入力(controlVector.y)で前方ベクトルに移動量を掛けて移動
+      const forward = new THREE.Vector3(0, 0, -1)
+        .applyQuaternion(ref.current.quaternion)
+        .multiplyScalar(controlVector.y * delta * moveSpeed);
+      ref.current.position.add(forward);
+    }
+  });
+
+  return (
+    <mesh ref={ref} position={[0, 0, 0]}>
+      {/* 機体の形状: ボックスジオメトリ */}
+      <boxGeometry args={[1, 0.5, 2]} />
+      {/* オレンジ色の標準マテリアル */}
+      <meshStandardMaterial color="orange" />
+    </mesh>
+  );
+}
+</file>
+
+<file path="src/app/page.tsx">
+"use client";
+
+import { Canvas } from "@react-three/fiber";
+import { OrbitControls, Stars } from "@react-three/drei";
+import { Suspense } from "react";
+import Ship from "./components/Ship";
+import UI from "./components/UI";
+import VirtualJoystick from "./components/Joystick";
+
+export default function HomePage() {
+  return (
+    <div className="w-screen h-screen relative">
+      {/* 3Dシーンを描画するCanvas */}
+      <Canvas camera={{ position: [0, 2, 5], fov: 75 }}>
+        {/* 環境光と方向光 */}
+        <ambientLight intensity={0.5} />
+        <directionalLight position={[5, 5, 5]} intensity={1} />
+        {/* 星の背景 */}
+        <Stars radius={100} depth={50} count={5000} factor={4} fade />
+        {/* Shipコンポーネントを遅延読み込み */}
+        <Suspense fallback={null}>
+          <Ship />
+        </Suspense>
+        {/* カメラ操作(ズーム／パン無効) */}
+        <OrbitControls enablePan={false} enableZoom={false} />
+      </Canvas>
+      {/* スコアやライフの表示 */}
+      <UI />
+      {/* 仮想ジョイスティック */}
+      <VirtualJoystick />
+    </div>
+  );
+}
+</file>
+
+</files>
