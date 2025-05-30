@@ -1,52 +1,51 @@
-"use client";
-import { useFrame } from "@react-three/fiber";
-import { useRef } from "react";
-import * as THREE from "three";
-import { useGameStore } from "../stores/gameStore";
-import { Sparkles } from "@react-three/drei";
+'use client';
+import { useFrame } from '@react-three/fiber';
+import { useRef } from 'react';
+import * as THREE from 'three';
+import { useGameStore } from '../stores/gameStore';
+import { Sparkles } from '@react-three/drei';
 
 export default function Ship() {
-  const ref = useRef<THREE.Mesh>(null);
-  const controlVector = useGameStore((state) => state.controlVector);
-  const updateShipPosition = useGameStore((state) => state.updateShipPosition);
-
-  const MOVE_SPEED = 10;
+  // グループ全体を動かすため、Groupへの参照を作成
+  const groupRef = useRef<THREE.Group>(null);
+  const controlVector = useGameStore(state => state.controlVector);
+  const updateShipPosition = useGameStore(state => state.updateShipPosition);
+  const MOVE_SPEED = 8;
 
   useFrame((_, delta) => {
-    if (!ref.current) return;
-    ref.current.position.x = THREE.MathUtils.clamp(
-      ref.current.position.x + controlVector.x * delta * MOVE_SPEED,
+    if (!groupRef.current) return;
+    // Groupのpositionを更新
+    const newX = THREE.MathUtils.clamp(
+      groupRef.current.position.x + controlVector.x * delta * MOVE_SPEED,
       -12,
       12
     );
-    ref.current.position.y = THREE.MathUtils.clamp(
-      ref.current.position.y + controlVector.y * delta * MOVE_SPEED,
+    const newY = THREE.MathUtils.clamp(
+      groupRef.current.position.y + controlVector.y * delta * MOVE_SPEED,
       -6,
       6
     );
-    updateShipPosition(ref.current.position);
+    groupRef.current.position.set(newX, newY, groupRef.current.position.z);
+    // ストアに位置反映
+    updateShipPosition(groupRef.current.position);
   });
 
   return (
-    <group>
-      {/* 本体 */}
-      <mesh ref={ref}>
+    <group ref={groupRef}>
+      {/* 本体メッシュ */}
+      <mesh>
         <boxGeometry args={[1, 0.5, 2]} />
-        <meshStandardMaterial
-          color="orange"
-          emissive="#ff5500"
-          emissiveIntensity={0.5}
-        />
+        <meshStandardMaterial color="orange" emissive="#ff5500" emissiveIntensity={0.5} />
       </mesh>
-      {/* 推進エフェクト */}
-      {/* <Sparkles
-        size={2}
-        scale={[1, 0.5, 1]}
-        position={[0, 0, 1.2]}
+      {/* 推進エフェクト: SparklesはGroupに結びつき、移動に追随 */}
+      <Sparkles
+        size={1}
+        scale={[1.2, 1.2, 1.2]}
+        position={[0, 0, 0.5]}
         speed={0.4}
-        count={30}
+        count={10}
         color="#ffaa00"
-      /> */}
+      />
     </group>
   );
 }
