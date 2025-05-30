@@ -42,9 +42,10 @@ export default function Ship() {
         size={1}
         scale={[1.2, 1.2, 1.2]}
         position={[0, 0, 0.5]}
-        speed={0.4}
-        count={10}
+        speed={0.02}
+        count={30}
         color="#ffaa00"
+        attach="geometry"
       />
     </group>
   );
